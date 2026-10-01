@@ -51,6 +51,7 @@ export function DemoTourPanel() {
   useEffect(() => {
     if (!active || !step) return;
     if (pathMatches(pathname, step.path)) return;
+    if (step.completeOnPath && pathname.startsWith(step.completeOnPath)) return;
     router.push(step.path);
   }, [active, stepIndex, step, pathname, router]);
 

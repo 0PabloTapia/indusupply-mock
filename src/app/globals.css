@@ -135,3 +135,7 @@
 .demo-tour-highlight {
   @apply relative z-[70] rounded-lg ring-4 ring-amber-400 ring-offset-2 ring-offset-background shadow-lg transition-shadow;
 }
+
+.demo-tour-highlight a {
+  @apply relative z-[71] cursor-pointer underline-offset-2 hover:underline;
+}

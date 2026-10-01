@@ -114,8 +114,8 @@ export default function CompatibilitiesPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
                   <Link
-                    href={`/products/${product.id}`}
-                    className="hover:underline"
+                    href={product.sku === "SKF-6204" ? "/products/prod-1" : `/products/${product.id}`}
+                    className="font-medium text-primary hover:underline"
                     data-tour={product.sku === "SKF-6204" ? "demo-skf-product-link" : undefined}
                   >
                     {product.name}
