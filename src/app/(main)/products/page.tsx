@@ -19,6 +19,8 @@ export default function ProductsPage() {
   const [category, setCategory] = useState("all");
   const [brand, setBrand] = useState("all");
   const [stockFilter, setStockFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [listingsFilter, setListingsFilter] = useState("all");
 
   const categories = useMemo(() => productService.categories(), [revision]);
   const brands = useMemo(() => productService.brands(), [revision]);
@@ -30,9 +32,16 @@ export default function ProductsPage() {
         category,
         brand,
         stock: stockFilter === "low" ? "low" : "all",
+        status: statusFilter === "all" ? "all" : (statusFilter as Product["status"]),
+        listings:
+          listingsFilter === "with"
+            ? "with"
+            : listingsFilter === "without"
+              ? "without"
+              : "all",
       })
       .then(setProducts);
-  }, [revision, search, category, brand, stockFilter]);
+  }, [revision, search, category, brand, stockFilter, statusFilter, listingsFilter]);
 
   const counts = useMemo(() => {
     const db = getDatabase();
@@ -53,10 +62,10 @@ export default function ProductsPage() {
         title="Productos"
         description="Catálogo técnico con stock compartido entre canales y publicaciones."
       />
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="mb-4 flex flex-wrap gap-3 rounded-xl border bg-card/60 p-4 shadow-sm">
         <Input
           placeholder="SKU, nombre, OEM, código fabricante…"
-          className="max-w-sm"
+          className="max-w-sm bg-background"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -91,11 +100,32 @@ export default function ProductsPage() {
             <SelectItem value="low">Stock bajo</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={statusFilter} onValueChange={(v) => v && setStatusFilter(v)}>
+          <SelectTrigger className="w-36">
+            <SelectValue placeholder="Estado" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todo estado</SelectItem>
+            <SelectItem value="active">Activo</SelectItem>
+            <SelectItem value="low_stock">Stock bajo</SelectItem>
+            <SelectItem value="inactive">Inactivo</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={listingsFilter} onValueChange={(v) => v && setListingsFilter(v)}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Publicaciones" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas</SelectItem>
+            <SelectItem value="with">Con publicación</SelectItem>
+            <SelectItem value="without">Sin publicación</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      <div className="rounded-lg border">
+      <div className="overflow-hidden rounded-xl border border-border/80 shadow-sm">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-muted/40 hover:bg-muted/40">
               <TableHead>SKU</TableHead>
               <TableHead>Producto</TableHead>
               <TableHead className="text-right">Stock</TableHead>

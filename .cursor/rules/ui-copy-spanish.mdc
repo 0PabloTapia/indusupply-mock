@@ -1,0 +1,12 @@
+---
+description: Copy en español para InduSupply (UI, tours, toasts)
+globs: **/*.{tsx,ts,md}
+alwaysApply: true
+---
+
+# Español en copy de producto
+
+- Usar **español neutro latinoamericano** (tú imperativo: haz, confirma, cierra, prueba).
+- **No** usar voseo argentino/rioplatense: evitar confirmá, hacé, probá, mirá, cerrá, creá, abrí, seguí, restablecé, acá (como adverbio), « » guillemets.
+- Preferir: haz clic, aquí, comillas " ".
+- Moneda y fechas: formato Chile (`es-CL`, CLP) está bien; el tono del texto no debe sonar argentino.

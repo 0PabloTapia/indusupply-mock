@@ -20,7 +20,7 @@ export default function CompatibilitiesPage() {
   const [brand, setBrand] = useState("Atlas Copco");
   const [type, setType] = useState("Compresor");
   const [model, setModel] = useState("GA11");
-  const [series, setSeries] = useState("2020");
+  const [series, setSeries] = useState("");
   const [results, setResults] = useState<{ product: Product; match: string }[]>([]);
   const [selectedProduct, setSelectedProduct] = useState("");
   const [form, setForm] = useState({
@@ -50,7 +50,7 @@ export default function CompatibilitiesPage() {
     <div className="space-y-8">
       <PageHeader
         title="Compatibilidades"
-        description="¿Qué equipo estás buscando? Un repuesto puede servir a muchas máquinas."
+        description="¿Qué equipo buscas? Un repuesto puede servir a varias máquinas."
       />
 
       <Card>
@@ -100,12 +100,24 @@ export default function CompatibilitiesPage() {
 
       <div>
         <p className="mb-3 text-sm font-medium">{results.length} productos compatibles</p>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-tour="demo-compat-results">
           {results.slice(0, 12).map(({ product, match }) => (
-            <Card key={product.id}>
+            <Card
+              key={product.id}
+              data-tour={product.sku === "SKF-6204" ? "demo-compat-skf-card" : undefined}
+              className={
+                product.sku === "SKF-6204"
+                  ? "border-2 border-primary/50 bg-primary/10 shadow-md ring-1 ring-primary/20"
+                  : undefined
+              }
+            >
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
-                  <Link href={`/products/${product.id}`} className="hover:underline">
+                  <Link
+                    href={`/products/${product.id}`}
+                    className="hover:underline"
+                    data-tour={product.sku === "SKF-6204" ? "demo-skf-product-link" : undefined}
+                  >
                     {product.name}
                   </Link>
                 </CardTitle>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
+import { CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { timeAgo } from "@/lib/format";
 import { purchaseService } from "@/services/purchase.service";
 import { useRevision } from "@/hooks/use-revision";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { PurchaseInvoice, PurchaseLine } from "@/types";
 
@@ -20,6 +25,11 @@ export default function PurchaseDetailPage() {
   const [lines, setLines] = useState<PurchaseLine[]>([]);
   const [processed, setProcessed] = useState(0);
   const [savedAt, setSavedAt] = useState<string | undefined>();
+  const [completeSummary, setCompleteSummary] = useState<{
+    stockUpdated: number;
+    productsCreated: number;
+    withoutListings: number;
+  } | null>(null);
 
   const load = useCallback(() => {
     purchaseService.getById(id).then((inv) => {
@@ -74,9 +84,7 @@ export default function PurchaseDetailPage() {
 
   async function complete() {
     const res = await purchaseService.complete(id);
-    toast.success(
-      `Stock actualizado · ${res.productsCreated} productos creados · ${res.stockUpdated} líneas procesadas`,
-    );
+    setCompleteSummary(res);
     load();
   }
 
@@ -97,7 +105,10 @@ export default function PurchaseDetailPage() {
       </PageHeader>
 
       {invoice.status !== "completed" && (
-        <div className="mb-6 space-y-2 rounded-lg border bg-muted/30 p-4">
+        <div
+          className="mb-6 space-y-2 rounded-xl border border-primary/20 bg-gradient-to-r from-emerald-500/5 to-primary/5 p-4 shadow-sm"
+          data-tour="demo-purchase-progress"
+        >
           <p className="text-sm text-emerald-700">
             ✓ Progreso guardado {savedAt ? timeAgo(savedAt) : "recién"}
           </p>
@@ -146,6 +157,34 @@ export default function PurchaseDetailPage() {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={!!completeSummary} onOpenChange={(open) => !open && setCompleteSummary(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              Recepción terminada
+            </DialogTitle>
+          </DialogHeader>
+          {completeSummary && (
+            <div className="space-y-3 text-sm">
+              <p>✓ Stock actualizado</p>
+              <p>✓ {completeSummary.productsCreated} productos creados</p>
+              <p>✓ {completeSummary.stockUpdated} productos procesados</p>
+              <p>✓ Costos actualizados</p>
+              <div className="rounded-lg border bg-amber-500/10 p-3 mt-4">
+                <p className="font-medium">{completeSummary.withoutListings} productos sin publicación</p>
+                <Link
+                  href="/marketplace/publish"
+                  className={cn(buttonVariants({ size: "sm" }), "mt-3 inline-flex")}
+                >
+                  Crear publicaciones
+                </Link>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

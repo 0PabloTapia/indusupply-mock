@@ -9,6 +9,7 @@ import { formatCLP, formatDateTime } from "@/lib/format";
 import { billingService } from "@/services/billing.service";
 import { useRevision } from "@/hooks/use-revision";
 import { toast } from "sonner";
+import { useDemoTourStore } from "@/store/demo-tour-store";
 
 export default function BillingPage() {
   const revision = useRevision();
@@ -24,6 +25,7 @@ export default function BillingPage() {
     const res = await billingService.issueDocument(id);
     setLoadingId(null);
     toast.success(`Documento emitido · Factura #${res.number} · Estado: Aceptada`);
+    useDemoTourStore.getState().signalEvent("invoice-issued");
     setDocs(await billingService.list());
   }
 
@@ -55,7 +57,7 @@ export default function BillingPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {docs.map((d) => (
+            {docs.map((d, idx) => (
               <TableRow key={d.id}>
                 <TableCell>{d.number ? `#${d.number}` : "Pendiente"}</TableCell>
                 <TableCell>{d.customerName}</TableCell>
@@ -69,7 +71,17 @@ export default function BillingPage() {
                 </TableCell>
                 <TableCell>
                   {d.status === "pending" && (
-                    <Button size="sm" disabled={loadingId === d.id} onClick={() => issue(d.id)}>
+                    <Button
+                      size="sm"
+                      disabled={loadingId === d.id}
+                      onClick={() => issue(d.id)}
+                      data-tour={
+                        d.status === "pending" &&
+                        idx === docs.findIndex((x) => x.status === "pending")
+                          ? "demo-billing-issue"
+                          : undefined
+                      }
+                    >
                       {loadingId === d.id ? "Emitiendo…" : "Emitir factura"}
                     </Button>
                   )}

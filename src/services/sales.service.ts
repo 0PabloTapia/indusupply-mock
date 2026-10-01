@@ -43,13 +43,19 @@ export const salesService = {
     return getDatabase().sales.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   },
 
-  async simulateMlSale(listingId: string): Promise<Sale | null> {
+  async simulateMlSale(listingId: string): Promise<{
+    sale: Sale;
+    stockBefore: number;
+    stockAfter: number;
+    listingTitle: string;
+  } | null> {
     await randomDelay(600, 900);
     const db = getDatabase();
     const listing = db.listings.find((l) => l.id === listingId);
     if (!listing) return null;
     const product = db.products.find((p) => p.id === listing.productId);
     if (!product) return null;
+    const stockBefore = product.stock;
     const qty = 1;
     const sale: Sale = {
       id: `sale-${Date.now()}`,
@@ -97,7 +103,13 @@ export const salesService = {
     });
     deductStock(sale.lines);
     notify();
-    return sale;
+    const stockAfter = getDatabase().products.find((p) => p.id === product.id)?.stock ?? stockBefore - qty;
+    return {
+      sale,
+      stockBefore,
+      stockAfter,
+      listingTitle: listing.title,
+    };
   },
 
   async registerPos(lines: SaleLine[]): Promise<Sale> {

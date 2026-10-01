@@ -31,7 +31,7 @@ export default function ListingsPage() {
           Crear publicación
         </Link>
       </PageHeader>
-      <div className="rounded-lg border">
+      <div className="rounded-lg border" data-tour="demo-listings-table">
         <Table>
           <TableHeader>
             <TableRow>

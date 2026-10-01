@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { shippingService } from "@/services/shipping.service";
 import { useRevision } from "@/hooks/use-revision";
 import { toast } from "sonner";
+import { useDemoTourStore } from "@/store/demo-tour-store";
 import type { LabelJob } from "@/types";
 
 export default function LabelsPage() {
@@ -20,6 +21,7 @@ export default function LabelsPage() {
   async function print(id: string) {
     const res = await shippingService.printLabel(id);
     toast.success(`Enviado a impresora ${res.printer}`);
+    useDemoTourStore.getState().signalEvent("label-printed");
     setLabels(await shippingService.pendingLabels());
   }
 
@@ -27,7 +29,7 @@ export default function LabelsPage() {
     <div>
       <PageHeader title="Etiquetas" description="Pedidos pendientes de etiquetar — título de venta preservado." />
       <div className="grid gap-4 lg:grid-cols-2">
-        {labels.map((l) => (
+        {labels.map((l, idx) => (
           <Card key={l.id}>
             <CardHeader>
               <CardTitle className="text-base">Pedido {l.orderRef}</CardTitle>
@@ -49,7 +51,12 @@ export default function LabelsPage() {
 │ ████████████████████████     │
 └──────────────────────────────┘`}
               </pre>
-              <Button onClick={() => print(l.id)}>Imprimir etiqueta</Button>
+              <Button
+                onClick={() => print(l.id)}
+                data-tour={idx === 0 ? "demo-label-print" : undefined}
+              >
+                Imprimir etiqueta
+              </Button>
             </CardContent>
           </Card>
         ))}

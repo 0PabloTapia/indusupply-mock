@@ -34,4 +34,16 @@ export const dashboardService = {
     await randomDelay(200, 400);
     return getDatabase().alerts.filter((a) => !a.resolved);
   },
+
+  async getWeeklySales() {
+    await randomDelay(150, 300);
+    const db = getDatabase();
+    const days = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+    return days.map((label, i) => {
+      const total = db.sales
+        .filter((_, idx) => idx % 7 === i)
+        .reduce((s, sale) => s + sale.total, 0);
+      return { label, total: total || 120000 + i * 45000 };
+    });
+  },
 };

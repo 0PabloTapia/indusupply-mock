@@ -11,6 +11,7 @@ export interface ProductFilters {
   brand?: string;
   stock?: "all" | "low" | "ok";
   status?: ProductStatus | "all";
+  listings?: "all" | "with" | "without";
 }
 
 function notify() {
@@ -42,6 +43,14 @@ export const productService = {
     }
     if (filters.status && filters.status !== "all") {
       items = items.filter((p) => p.status === filters.status);
+    }
+    if (filters.listings === "with") {
+      const db = getDatabase();
+      items = items.filter((p) => db.listings.some((l) => l.productId === p.id));
+    }
+    if (filters.listings === "without") {
+      const db = getDatabase();
+      items = items.filter((p) => !db.listings.some((l) => l.productId === p.id));
     }
     return items;
   },

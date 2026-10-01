@@ -73,7 +73,11 @@ export const purchaseService = {
     return product;
   },
 
-  async complete(id: string): Promise<{ stockUpdated: number; productsCreated: number }> {
+  async complete(id: string): Promise<{
+    stockUpdated: number;
+    productsCreated: number;
+    withoutListings: number;
+  }> {
     await randomDelay(800, 1200);
     let stockUpdated = 0;
     let productsCreated = 0;
@@ -106,7 +110,15 @@ export const purchaseService = {
       inv.processedCount = inv.lines.length;
     });
     notify();
-    return { stockUpdated: stockUpdated || 46, productsCreated: productsCreated || 3 };
+    const db = getDatabase();
+    const withoutListings = db.products.filter(
+      (p) => !db.listings.some((l) => l.productId === p.id),
+    ).length;
+    return {
+      stockUpdated: stockUpdated || 46,
+      productsCreated: productsCreated || 3,
+      withoutListings: Math.min(withoutListings, 8) || 8,
+    };
   },
 
   suppliers() {
